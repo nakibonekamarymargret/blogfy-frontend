@@ -3,6 +3,7 @@ import { useParams } from "react-router-dom";
 import axios from "axios";
 import { FaHeart, FaComment } from "react-icons/fa";
 import { format } from "date-fns";
+import CommentSection from "../comments/CommentSection";
 
 function ViewPost() {
   const { id } = useParams(); // Correct way to extract id
@@ -12,15 +13,14 @@ function ViewPost() {
     const fetchPost = async () => {
       try {
         const res = await axios.get(`http://localhost:7107/posts/${id}`);
-        const data = await res.json();
-        setPost(data);
+        setPost(res.data);
+        console.log("Fetched post:", res.data);
       } catch (err) {
         console.error('Failed to fetch post:', err);
       }
     };
     fetchPost();
   }, [id]);
-    if (!post) return <p>Loading...</p>;
 
 
   return (
@@ -57,6 +57,9 @@ function ViewPost() {
               <span className="flex items-center gap-1">
                 <FaComment /> {post.comments?.length || 0}
               </span>
+            </div>
+            <div className="commentsection">
+              <CommentSection postId={post.id} />             
             </div>
           </div>
         )}

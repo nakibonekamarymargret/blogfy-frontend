@@ -1,192 +1,44 @@
-// import React, { useEffect, useState, useRef, useCallback } from "react";
-// import { useNavigate } from "react-router-dom";
-// import { FaHeart, FaComment } from "react-icons/fa";
-// import { format } from "date-fns";
-
-// const Posts = () => {
-//   const [posts, setPosts] = useState([]);
-//   const [page, setPage] = useState(0);
-//   const [hasMore, setHasMore] = useState(true);
-//   const loader = useRef(null);
-//   const navigate = useNavigate();
-
-//   const fetchPosts = useCallback(async () => {
-//     try {
-//       const res = await fetch(
-//         `http://localhost:7107/posts?page=${page}&size=3`
-//       );
-//       if (!res.ok) throw new Error("Failed to fetch posts");
-//       const data = await res.json();
-
-//       if (data.content.length === 0 || data.last === true) {
-//         setHasMore(false);
-//       }
-
-//       setPosts((prev) => {
-//         const combined = [...prev, ...data.content];
-//         const uniquePosts = Array.from(
-//           new Map(combined.map((p) => [p.id, p])).values()
-//         );
-//         return uniquePosts;
-//       });
-
-//       setPage((prev) => prev + 1);
-//     } catch (err) {
-//       console.error("Error fetching posts:", err);
-//     }
-//   }, [page]);
-
-//   useEffect(() => {
-//     fetchPosts();
-//   }, [fetchPosts]);
-
-//   const handleObserver = useCallback(
-//     (entries) => {
-//       const target = entries[0];
-//       if (target.isIntersecting && hasMore) {
-//         fetchPosts();
-//       }
-//     },
-//     [fetchPosts, hasMore]
-//   );
-
-//   useEffect(() => {
-//     const option = {
-//       root: null,
-//       rootMargin: "20px",
-//       threshold: 1.0,
-//     };
-//     const observer = new IntersectionObserver(handleObserver, option);
-//     if (loader.current) observer.observe(loader.current);
-
-//     return () => {
-//       if (loader.current) observer.unobserve(loader.current);
-//     };
-//   }, [handleObserver]);
-
-//   const handlePostView = (id) => {
-//     navigate(`/posts/${id}`);
-//   };
-
-//   return (
-//     <div className="px-4 grid gap-6 grid-cols-12 mx-3">
-//       <div className="col-span-8">
-//         {posts.map((post) => (
-//           <div
-//             key={post.id}
-//             className="bg-white rounded-xl shadow-md p-4 hover:shadow-xl cursor-pointer mb-6"
-//             onClick={() => handlePostView(post.id)}
-//           >
-//             <img
-//               src={post.coverImageUrl}
-//               alt={post.title}
-//               className="w-full h-48 object-cover rounded-lg mb-4"
-//             />
-//             <h2 className="text-xl font-semibold text-gray-800">
-//               {post.title}
-//             </h2>
-//             <p className="text-sm text-gray-500 mt-2">
-//               {post.publishedAt
-//                 ? format(new Date(post.publishedAt), "dd MMM yyyy")
-//                 : "Date not available"}
-//             </p>
-//             <div className="flex items-center gap-4 mt-4 text-gray-600">
-//               <span className="flex items-center gap-1">
-//                 <FaHeart /> 0
-//               </span>
-//               <span className="flex items-center gap-1">
-//                 <FaComment /> 0
-//               </span>
-//             </div>
-//           </div>
-//         ))}
-
-//         {hasMore ? (
-//           <div ref={loader} className="text-center text-gray-500 py-4">
-//             Loading more posts...
-//           </div>
-//         ) : (
-//           <div className="text-center text-gray-400 py-4">
-//             No more posts to load.
-//           </div>
-//         )}
-//       </div>
-
-      
-//     </div>
-//   );
-// };
-
-// export default Posts;
-import React, { useEffect, useState, useRef, useCallback } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { FaHeart, FaComment } from "react-icons/fa";
 import { format } from "date-fns";
 
 const Posts = () => {
   const [posts, setPosts] = useState([]);
-  const [page, setPage] = useState(0);
-  const [hasMore, setHasMore] = useState(true);
-  const loader = useRef(null);
-  const navigate = useNavigate();
 
-  const handlePostView = (id) => {
-    navigate(`/posts/${id}`);
-  };
+  const navigate = useNavigate();
 
   const fetchPosts = useCallback(async () => {
     try {
       const res = await fetch(
-        `http://localhost:7107/posts?page=${page}&size=3`
+        `http://localhost:7107/posts`
       );
       if (!res.ok) throw new Error("Failed to fetch posts");
       const data = await res.json();
-
-      if (data.content.length === 0 || data.last === true) {
-        setHasMore(false);
-      }
+      
 
       setPosts((prev) => {
-        const combined = [...prev, ...data.content];
+        const combined = [...prev, ...data]; 
         const uniquePosts = Array.from(
           new Map(combined.map((p) => [p.id, p])).values()
         );
         return uniquePosts;
       });
 
-      setPage((prev) => prev + 1);
     } catch (err) {
       console.error("Error fetching posts:", err);
     }
-  }, [page]);
+  }, [posts]);
 
   useEffect(() => {
     fetchPosts();
-  }, [fetchPosts]); // Still depends on fetchPosts for the initial load
+  }, [fetchPosts]);
 
-  const handleObserver = useCallback(
-    (entries) => {
-      const target = entries[0];
-      if (target.isIntersecting && hasMore) {
-        fetchPosts();
-      }
-    },
-    [fetchPosts, hasMore]
-  );
 
-  useEffect(() => {
-    const option = {
-      root: null,
-      rootMargin: "20px",
-      threshold: 1.0,
-    };
-    const observer = new IntersectionObserver(handleObserver, option);
-    if (loader.current) observer.observe(loader.current);
-
-    return () => {
-      if (loader.current) observer.unobserve(loader.current);
-    };
-  }, [handleObserver]);
+ 
+  const handlePostView = (id) => {
+    navigate(`/posts/${id}`);
+  };
 
   return (
     <div className="px-4 grid gap-6 grid-cols-12 mx-3">
@@ -207,7 +59,7 @@ const Posts = () => {
             </h2>
             <p className="text-sm text-gray-500 mt-2">
               {post.publishedAt
-                ? format(new Date(post.publishedAt), "dd MMM<ctrl3348>")
+                ? format(new Date(post.publishedAt), "dd MMM yyyy")
                 : "Date not available"}
             </p>
             <div className="flex items-center gap-4 mt-4 text-gray-600">
@@ -221,16 +73,9 @@ const Posts = () => {
           </div>
         ))}
 
-        {hasMore ? (
-          <div ref={loader} className="text-center text-gray-500 py-4">
-            Loading more posts...
-          </div>
-        ) : (
-          <div className="text-center text-gray-400 py-4">
-            No more posts to load.
-          </div>
-        )}
+    
       </div>
+
       <div className="col-span-4 shadow text-white rounded p-4">
         <aside>
           <div className="popular_posts">
@@ -297,7 +142,7 @@ const Posts = () => {
             </p>
           </div>
         </aside>
-      </div>{" "}
+      </div>
     </div>
   );
 };
