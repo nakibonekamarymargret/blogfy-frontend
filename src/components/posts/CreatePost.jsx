@@ -18,7 +18,6 @@ function CreatePost() {
     // Editing
     const {postId} = useParams();
     const isEditing = !!postId;
-
     const navigate = useNavigate();
     // Load saved draft from localStorage on mount
     useEffect(() => {
@@ -34,6 +33,7 @@ function CreatePost() {
         localStorage.setItem("blog-content", content);
     }, [title, content]);
     // Editing a post
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     useEffect(async () => {
         const fetchPost = async () => {
             if (!isEditing) return;
@@ -267,7 +267,4 @@ function CreatePost() {
         </div>
     );
 }
-
 export default CreatePost;
-
-

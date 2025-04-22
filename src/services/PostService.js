@@ -3,10 +3,11 @@ import axios from "axios";
 const API_URL = "http://localhost:7107/posts";
 
 class PostService {
-
+// get all posts
     getAllPosts(){
-        return axios.post(`${API_URL}`)
+        return axios.get(`${API_URL}`)
     }
+    // create post
     createPost(postData, token) {
         return axios.post(`${API_URL}/create`, postData, {
             headers: {
@@ -24,6 +25,7 @@ class PostService {
         headers: {Authorization: `Bearer ${token}`}
     });
 
+    // viewpost
 }
 
 export default new PostService();
