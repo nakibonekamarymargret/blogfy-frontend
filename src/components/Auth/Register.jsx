@@ -10,7 +10,6 @@ function Register() {
   const [password, setPassword] = useState("");
   const [message, setMessage] = useState("");
   const navigate = useNavigate();
-
   const handleRegister = async (e) => {
     e.preventDefault();
     try {
@@ -20,16 +19,19 @@ function Register() {
         email,
         password,
       });
-      if (response.data.message === "User registered successfully") {
-        navigate('/login')
+      console.log("Registration response:", response.data);
+
+      // Check for the correct success message
+      if (response.data.message === "You have successfully registered") {
+        navigate("/posts"); // navigate to post page
       } else {
         setMessage("Registration failed");
       }
     } catch (error) {
-      setMessage("Registration failed", error);
+      console.error("Registration error:", error);
+      setMessage("Registration failed: " + (error.response?.data?.message || "Unknown error"));
     }
   };
-
   const handleSwitchToLogin = () => {
     navigate("/login");
   };

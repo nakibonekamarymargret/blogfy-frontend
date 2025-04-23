@@ -10,25 +10,22 @@ const Posts = () => {
 
   const fetchPosts = useCallback(async () => {
     try {
-      const res = await fetch(
-        `http://localhost:7107/posts`
-      );
+      const res = await fetch(`http://localhost:7107/posts`);
       if (!res.ok) throw new Error("Failed to fetch posts");
       const data = await res.json();
-      
+      console.log(data);
 
       setPosts((prev) => {
-        const combined = [...prev, ...data]; 
+        const combined = [...prev, ...data];
         const uniquePosts = Array.from(
-          new Map(combined.map((p) => [p.id, p])).values()
+            new Map(combined.map((p) => [p.id, p])).values()
         );
         return uniquePosts;
       });
-
     } catch (err) {
       console.error("Error fetching posts:", err);
     }
-  }, [posts]);
+  }, []); // Removed `posts` here
 
   useEffect(() => {
     fetchPosts();
