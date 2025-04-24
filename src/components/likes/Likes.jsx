@@ -24,6 +24,7 @@ const Likes = ({ postId, token }) => {
 
       if (!isLiked) {
         await PostService.addLikeUnlike(postId, token);
+        
         setLikeCount((prev) => prev + 1);
       } else {
         await PostService.removeLike(postId, token); // assumes postId = like ID
