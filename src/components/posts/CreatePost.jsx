@@ -34,32 +34,32 @@ function CreatePost() {
     }, [title, content]);
     // Editing a post
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    useEffect(async () => {
-        const fetchPost = async () => {
-            if (!isEditing) return;
+    useEffect(() => {
+      const fetchPost = async () => {
+        if (!isEditing) return;
 
-            try {
-                const token = localStorage.getItem("token");
-                const response = await PostService.getPostById(postId, token); // you must define this in PostService.js
-                const {title, content, coverImageUrl, author} = response.data;
+        try {
+          const token = localStorage.getItem("token");
+          const response = await PostService.getPostById(postId, token); // you must define this in PostService.js
+          const { title, content, coverImageUrl, author } = response.data;
 
-                const loggedInUsername = localStorage.getItem("username");
-                if (author !== loggedInUsername) {
-                    alert("You are not authorized to edit this post.");
-                    navigate("/");
-                    return;
-                }
+          const loggedInUsername = localStorage.getItem("username");
+          if (author !== loggedInUsername) {
+            alert("You are not authorized to edit this post.");
+            navigate("/posts");
+            return;
+          }
 
-                setTitle(title);
-                setContent(content);
-                setCoverImage(coverImageUrl);
-            } catch (error) {
-                console.error("Failed to load post", error);
-            }
-        };
+          setTitle(title);
+          setContent(content);
+          setCoverImage(coverImageUrl);
+        } catch (error) {
+          console.error("Failed to load post", error);
+        }
+      };
 
-        await fetchPost();
-    }, [isEditing, postId]);
+      fetchPost(); // Call the async function
+    }, [isEditing, postId, navigate]);
 
     // Handlers
     // Handle image upload
@@ -81,12 +81,12 @@ function CreatePost() {
     const handleSaveDraft = async () => {
         setSavedDraft({title, content, coverImage});
         await saveToApi("draft");
-        navigate("/");
+        navigate("/posts");
     };
     const handlePublish = async () => {
         try {
             await saveToApi("published");
-            navigate("/");
+            navigate("/posts");
         } catch (error) {
             console.error("Error publishing post", error);
         }
@@ -124,7 +124,7 @@ function CreatePost() {
                 alert(`Blog ${status === "published" ? "published" : "saved as draft"}!`);
             }
 
-            navigate("/");
+            navigate("/posts");
         } catch (error) {
             console.error("Error saving to API:", error);
             alert("Something went wrong while saving.");
@@ -139,7 +139,7 @@ function CreatePost() {
             const token = localStorage.getItem("token");
             await PostService.deletePost(postId, token);
             alert("Post deleted successfully.");
-            navigate("/");
+            navigate("/posts");
         } catch (error) {
             console.error("Error deleting post:", error);
             alert("Failed to delete post.");
