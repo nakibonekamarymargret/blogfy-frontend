@@ -4,11 +4,10 @@ import axios from "axios";
 import { FaHeart, FaComment } from "react-icons/fa";
 import { format } from "date-fns";
 import CommentSection from "../comments/CommentSection";
-
 import { RiHeartAdd2Line } from "react-icons/ri";
 import { IoBookmarkOutline } from "react-icons/io5";
 import { FaRegComment } from "react-icons/fa6";
-
+import Likes from "../likes/Likes";
 
 const ViewPost = () => {
   const { id } = useParams();
@@ -16,17 +15,19 @@ const ViewPost = () => {
   const [author, setAuthor] = useState({});
   const [popularPosts, setPopularPosts] = useState([]);
   const [commentCount, setCommentCount] = useState(0);
+  const [likesCount, setLikesCount] = useState(0);
   const token = localStorage.getItem("token");
 
   const fetchPost = useCallback(async () => {
     try {
       const res = await axios.get(`http://localhost:7107/posts/${id}`);
       const postData = res.data;
-
       setPost(postData);
       setCommentCount(
         postData.comments?.filter((c) => c.status === "APPROVED").length || 0
       );
+      setLikesCount(postData.likes || 0); // Set likes count
+      // Fetch author data
       setAuthor(postData.author); // Set author data
 
       const postsRes = await axios.get(
@@ -45,6 +46,7 @@ const ViewPost = () => {
     fetchPost();
   }, [fetchPost]);
 
+
   return (
     <div className="p-4 m-8 grid gap-6 grid-cols-12">
       {/* Main post content */}
@@ -55,19 +57,22 @@ const ViewPost = () => {
               <RiHeartAdd2Line />
             </li>
             <li className="mb-4">
-              <FaRegComment />{commentCount}
+              <FaRegComment />
+              {commentCount}
             </li>
-            <li className="mb-4"><IoBookmarkOutline/></li>
+            <li className="mb-4">
+              <IoBookmarkOutline />
+            </li>
           </ul>
         </div>
       </div>
-      <div className="col-span-7 card bg-slate-100 shadow-md rounded p-3 text-gray-800">
+      <div className="col-span-7 card bg-slate-100 shadow-md rounded p-7 text-gray-800">
         <div className="bg-white rounded-xl shadow-md p-4 hover:shadow-xl cursor-pointer mb-6">
           <div className="flex ">
             <img
               src={author.profilePicUrl || "/profileImage.png"}
               alt={author.username || "author"}
-              className="w-12 h-12 rounded-full object-cover mr-4"
+              className="w-12 h-24 rounded-full object-cover mr-4"
             />
             <div className="flex flex-col">
               <p className="text-sm text-gray-500">
@@ -84,11 +89,14 @@ const ViewPost = () => {
           <h2 className=" uppercase mb-3 mt-2  text-3xl font-semibold text-gray-800">
             {post.title}
           </h2>
-          <img
-            src={post.coverImageUrl || "/default-image.jpg"}
-            alt={post.title || "Post image"}
-            className="w-full h-48 object-cover rounded-lg mb-4"
-          />
+          <div className="h-60">
+            <img
+              src={post.coverImageUrl || "/default-image.jpg"}
+              alt={post.title || "Post image"}
+              className="w-full h-full object-cover mb-4"
+            />
+          </div>
+
           <p className="text-sm text-gray-500 mt-2">
             {post.publishedAt
               ? format(new Date(post.publishedAt), "dd MMM yyyy")
@@ -96,24 +104,27 @@ const ViewPost = () => {
           </p>
           <div className="flex items-center gap-4 mt-4 text-gray-600">
             <span className="flex items-center gap-1">
-              <FaHeart /> {post.likes || 0}
+              <Likes postId={id} token={token} />
+              {""}
             </span>
-            <span className="flex items-center gap-1">
+            <span className="text-xl flex items-center gap-1">
               <FaComment /> {commentCount}
             </span>
           </div>
-          <p className="text-gray-800 mt-4">{post.content}</p>
-          {/* Comment Section */}
-          {post.id && (
-            <CommentSection
-              postId={post.id}
-              token={token}
-              onCommentAdded={fetchPost}
-              onCommentDeleted={fetchPost}
-              onCommentCountChange={setCommentCount}
-              currentUser={undefined}
-            />
-          )}
+          <p className="text-gray-800 mt-4 px-8 leading-10">{post.content}</p>
+          <div className="comment-section">
+            {/* Comment Section */}
+            {post.id && (
+              <CommentSection
+                postId={post.id}
+                token={token}
+                onCommentAdded={fetchPost}
+                onCommentDeleted={fetchPost}
+                onCommentCountChange={setCommentCount}
+                currentUser={undefined}
+              />
+            )}
+          </div>
         </div>
       </div>
 
