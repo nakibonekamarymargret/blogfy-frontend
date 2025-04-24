@@ -102,6 +102,7 @@ const ViewPost = () => {
               <FaComment /> {commentCount}
             </span>
           </div>
+          <p className="text-gray-800 mt-4">{post.content}</p>
           {/* Comment Section */}
           {post.id && (
             <CommentSection
